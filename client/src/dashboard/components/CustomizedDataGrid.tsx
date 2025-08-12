@@ -1,13 +1,19 @@
-import * as React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { columns, rows } from '../internals/data/gridData';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 export default function CustomizedDataGrid() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const columnsToShow = isMobile ? columns.slice(0, 3) : columns;
+
   return (
     <DataGrid
-      checkboxSelection
+      // checkboxSelection
+      disableColumnMenu
       rows={rows}
-      columns={columns}
+      columns={columnsToShow}
       getRowClassName={(params) =>
         params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'
       }

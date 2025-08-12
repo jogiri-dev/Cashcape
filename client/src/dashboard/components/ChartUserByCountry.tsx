@@ -7,7 +7,9 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
+import LinearProgress, {
+  linearProgressClasses,
+} from '@mui/material/LinearProgress';
 
 import {
   IndiaFlag,
@@ -129,7 +131,7 @@ export default function ChartUserByCountry() {
     >
       <CardContent>
         <Typography component="h2" variant="subtitle2">
-          Users by country
+          Expenses for selected period by category
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <PieChart

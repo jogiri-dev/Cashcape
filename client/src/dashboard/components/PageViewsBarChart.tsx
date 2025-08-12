@@ -18,7 +18,7 @@ export default function PageViewsBarChart() {
     <Card variant="outlined" sx={{ width: '100%' }}>
       <CardContent>
         <Typography component="h2" variant="subtitle2" gutterBottom>
-          Page views and downloads
+          Expenses for previous months
         </Typography>
         <Stack sx={{ justifyContent: 'space-between' }}>
           <Stack
