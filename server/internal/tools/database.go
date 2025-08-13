@@ -5,19 +5,15 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type LoginDetails struct {
-	AuthToken string
-	Username  string
-}
-
 type DatabaseInterface interface {
-	GetUserLoginDetails(username string) *LoginDetails
-	GetExpenses(userId int64) *api.ExpensesResponse
+	GetExpenses(userId string) *api.ExpensesResponse
 	SetupDatabase() error
 }
 
-func NewDatabase() (*DatabaseInterface, error) {
-	var database DatabaseInterface = &mockDB{}
+func NewDatabase() (DatabaseInterface, error) {
+
+	// var database DatabaseInterface = &mockDB{}
+	var database DatabaseInterface = &postgresDB{}
 
 	var err error = database.SetupDatabase()
 	if err != nil {
@@ -25,5 +21,5 @@ func NewDatabase() (*DatabaseInterface, error) {
 		return nil, err
 	}
 
-	return &database, nil
+	return database, nil
 }

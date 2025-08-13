@@ -6,28 +6,32 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/jogiri-dev/cashcape/server/internal/handlers"
+	"github.com/jogiri-dev/cashcape/server/internal/tools"
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 )
 
 func main() {
-	errEnv := godotenv.Load("../.env")
-	if errEnv != nil {
-		log.Fatal("Error loading .env file")
+	if err := godotenv.Load("../.env"); err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
 	}
 
 	log.SetReportCaller(true)
 
-	var r *chi.Mux = chi.NewRouter()
-	handlers.Handler(r)
+	db, err := tools.NewDatabase() // TODO: Rename/reorganize tools?
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	r := chi.NewRouter()
+	h := handlers.NewHandler(db)
+	h.RegisterRoutes(r)
 
 	var port = "localhost:8000"
 
 	fmt.Printf("Starting GO API service on http://%v", port)
 
-	err := http.ListenAndServe(port, r)
-
-	if err != nil {
+	if err = http.ListenAndServe(port, r); err != nil {
 		log.Error(err)
 	}
 }

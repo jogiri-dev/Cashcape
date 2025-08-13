@@ -6,15 +6,15 @@ import (
 	"time"
 )
 
-type Users struct {
-	ID        int64     `json:"id"`        // Unique identifier
-	Email     string    `json:"email"`     // Email serves as username
-	CreatedAt time.Time `json:"createdAt"` // Account creation time
+type User struct {
+	ID        string    `gorm:"type:uuid;default:uuid_generate_v4()" json:"id"` // UUID as string
+	Email     string    `json:"email"`                                          // Email serves as username
+	CreatedAt time.Time `json:"createdAt"`                                      // Account creation time
 }
 
 type Expense struct {
-	ID          int64     `json:"id"` // Unique identifier
-	UserID      int64     `json:"-"`  // Don't return
+	ID          int64     `json:"id"`
+	UserID      string    `gorm:"type:uuid" json:"-"` // UUID as string, don't return in API
 	Amount      float64   `json:"amount"`
 	Currency    string    `json:"currency"`
 	Description string    `json:"description"`
@@ -23,8 +23,8 @@ type Expense struct {
 }
 
 type Category struct {
-	ID          int64  `json:"id"` // Unique identifier
-	UserID      int64  `json:"-"`  // For future multi-user support
+	ID          int64  `json:"id"`
+	UserID      string `gorm:"type:uuid" json:"-"` // UUID as string, don't return in API
 	Description string `json:"description"`
 	Symbol      string `json:"symbol"` // Unicode symbol
 }
