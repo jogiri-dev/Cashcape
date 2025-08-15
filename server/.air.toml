@@ -1,0 +1,21 @@
+# .air.toml
+
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  bin = "tmp/main"                     # Compiled binary location
+  cmd = "go build -o tmp/main cmd/api/main.go"
+  include_ext = ["go"]
+  exclude_dir = ["tmp", "vendor"]
+  follow_symlink = true
+  delay = 1000
+  kill_delay = 500
+  log = "stdout"
+  poll = false
+
+[color]
+  main = "yellow"
+  watcher = "cyan"
+  build = "green"
+  runner = "magenta"
