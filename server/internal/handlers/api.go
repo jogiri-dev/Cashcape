@@ -5,16 +5,21 @@ import (
 
 	"github.com/go-chi/chi"
 	chimiddle "github.com/go-chi/chi/middleware"
+	"github.com/go-playground/validator/v10"
+	"github.com/jogiri-dev/cashcape/server/api"
 	"github.com/jogiri-dev/cashcape/server/internal/tools"
 	log "github.com/sirupsen/logrus"
 )
 
 type Handler struct {
-	DB tools.DatabaseInterface
+	db        tools.DatabaseInterface
+	validator *validator.Validate
 }
 
 func NewHandler(db tools.DatabaseInterface) *Handler {
-	return &Handler{DB: db}
+	v := validator.New()
+	v.RegisterValidation("currency", api.CurrencyValidationFn)
+	return &Handler{db: db, validator: v}
 }
 
 func (h *Handler) RegisterRoutes(r *chi.Mux) {
@@ -30,5 +35,7 @@ func (h *Handler) RegisterRoutes(r *chi.Mux) {
 
 	r.Route("/api/expenses", func(router chi.Router) {
 		router.Get("/", h.GetExpenses)
+		router.Post("/", h.AddExpense)
 	})
+
 }

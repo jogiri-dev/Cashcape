@@ -1,8 +1,9 @@
 package tools
 
 import (
-	"log"
 	"os"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/jogiri-dev/cashcape/server/api"
 	"gorm.io/driver/postgres"
@@ -13,11 +14,26 @@ type postgresDB struct {
 	db *gorm.DB
 }
 
-// GetExpenses implements DatabaseInterface.
-func (p *postgresDB) GetExpenses(userId string) *api.ExpensesResponse {
+func (p *postgresDB) GetExpenses(userId string) (*api.GetExpensesResponse, error) {
 	var expenses []api.Expense
-	p.db.Find(&expenses) // TODO: Implement Multiuser lookup
-	return &api.ExpensesResponse{Expenses: expenses}
+	// TODO: Implement Multiuser lookup
+	if result := p.db.Find(&expenses); result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &api.GetExpensesResponse{Expenses: expenses}, nil
+}
+
+func (p *postgresDB) AddExpense(params api.AddExpenseParams) (*api.AddExpenseResponse, error) {
+
+	//TODO: Replace with real logic
+	params.Expense.UserID = "11111111-1111-1111-1111-111111111111"
+
+	if result := p.db.Create(&params.Expense); result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &api.AddExpenseResponse{Expense: params.Expense}, nil
 }
 
 func (p *postgresDB) SetupDatabase() error {

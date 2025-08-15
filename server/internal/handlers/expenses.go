@@ -10,22 +10,20 @@ import (
 )
 
 func (h *Handler) GetExpenses(w http.ResponseWriter, r *http.Request) {
-	var params = api.ExpensesParams{}
+	var params = api.GetExpensesParams{}
 	var decoder *schema.Decoder = schema.NewDecoder()
 
-	err := decoder.Decode(&params, r.URL.Query())
-
-	if err != nil {
+	if err := decoder.Decode(&params, r.URL.Query()); err != nil {
 		log.Error(err)
-		api.InternalErrorHandler(w)
+		http.Error(w, "Invalid request body: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	// TODO: Retrieve user ID from auth token/session
-	expenseResponse := h.DB.GetExpenses("") // TODO: MVP getexpenses lists all expenses
-
-	if expenseResponse == nil {
-		log.Error(err) // TODO: Check what happens if empty array?
+	// TODO: MVP getexpenses lists all expenses
+	expenseResponse, err := h.db.GetExpenses("")
+	if err != nil {
+		log.WithError(err).Error("Could not retrieve expenses from DB") // TODO: Check what happens if empty array?
 		api.InternalErrorHandler(w)
 		return
 	}
@@ -39,4 +37,37 @@ func (h *Handler) GetExpenses(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+}
+
+func (h *Handler) AddExpense(w http.ResponseWriter, r *http.Request) {
+	var req = api.AddExpenseParams{}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Error(err)
+		api.DecodeErrorHandler(w, err)
+		return
+	}
+
+	log.Info(req)
+
+	if err := h.validator.Struct(req.Expense); err != nil {
+		log.Error(err)
+		api.ValidationErrorHandler(w, err)
+		return
+	}
+
+	response, err := h.db.AddExpense(req)
+
+	if err != nil {
+		log.WithError(err).Error("Could not add expense to DB")
+		api.InternalErrorHandler(w)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		log.Error(err)
+		api.InternalErrorHandler(w)
+		return
+	}
 }
