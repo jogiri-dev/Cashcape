@@ -42,7 +42,7 @@ type GetExpensesResponse struct {
 }
 
 type GetExpensesParams struct {
-	// UserEmail string
+	//TODO Add pagination and filtering option
 }
 
 type AddExpenseParams struct {

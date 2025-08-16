@@ -13,15 +13,21 @@ func (h *Handler) GetExpenses(w http.ResponseWriter, r *http.Request) {
 	var params = api.GetExpensesParams{}
 	var decoder *schema.Decoder = schema.NewDecoder()
 
+	userId, ok := getUserIDfromContext(r)
+	if !ok {
+		log.Error("could not retrieve userId")
+		api.InternalErrorHandler(w)
+		return
+	}
+
+	// TODO Remove as no body used here for now?
 	if err := decoder.Decode(&params, r.URL.Query()); err != nil {
 		log.Error(err)
 		http.Error(w, "Invalid request body: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	// TODO: Retrieve user ID from auth token/session
-	// TODO: MVP getexpenses lists all expenses
-	expenseResponse, err := h.db.GetExpenses("")
+	expenseResponse, err := h.db.GetExpenses(userId)
 	if err != nil {
 		log.WithError(err).Error("Could not retrieve expenses from DB") // TODO: Check what happens if empty array?
 		api.InternalErrorHandler(w)
@@ -48,13 +54,20 @@ func (h *Handler) AddExpense(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Info(req)
-
 	if err := h.validator.Struct(req.Expense); err != nil {
 		log.Error(err)
 		api.ValidationErrorHandler(w, err)
 		return
 	}
+
+	// Add userId from context
+	userId, ok := getUserIDfromContext(r)
+	if !ok {
+		log.Error("Could not retrieve userId")
+		api.InternalErrorHandler(w)
+		return
+	}
+	req.Expense.UserID = userId
 
 	response, err := h.db.AddExpense(req)
 
@@ -70,4 +83,10 @@ func (h *Handler) AddExpense(w http.ResponseWriter, r *http.Request) {
 		api.InternalErrorHandler(w)
 		return
 	}
+}
+
+func getUserIDfromContext(r *http.Request) (string, bool) {
+	userId, ok := r.Context().Value("userContextID").(string)
+
+	return userId, ok
 }

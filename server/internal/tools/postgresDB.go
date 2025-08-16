@@ -16,8 +16,7 @@ type postgresDB struct {
 
 func (p *postgresDB) GetExpenses(userId string) (*api.GetExpensesResponse, error) {
 	var expenses []api.Expense
-	// TODO: Implement Multiuser lookup
-	if result := p.db.Find(&expenses); result.Error != nil {
+	if result := p.db.Where(&api.Expense{UserID: userId}).Find(&expenses); result.Error != nil {
 		return nil, result.Error
 	}
 
@@ -25,9 +24,6 @@ func (p *postgresDB) GetExpenses(userId string) (*api.GetExpensesResponse, error
 }
 
 func (p *postgresDB) AddExpense(params api.AddExpenseParams) (*api.AddExpenseResponse, error) {
-
-	//TODO: Replace with real logic
-	params.Expense.UserID = "11111111-1111-1111-1111-111111111111"
 
 	if result := p.db.Create(&params.Expense); result.Error != nil {
 		return nil, result.Error

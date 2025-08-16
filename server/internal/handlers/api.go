@@ -31,6 +31,7 @@ func (h *Handler) RegisterRoutes(r *chi.Mux) {
 		log.Fatal("Set API credentials in .env file")
 	}
 
+	r.Use(chimiddle.WithValue("userContextID", "11111111-1111-1111-1111-111111111111")) // TODO: Replace with authentication middleware
 	r.Use(chimiddle.BasicAuth("cashcape", map[string]string{apiUser: apiPassword}))
 
 	r.Route("/api/expenses", func(router chi.Router) {
