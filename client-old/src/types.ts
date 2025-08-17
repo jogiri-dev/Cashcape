@@ -21,7 +21,7 @@ export const ExpenseSchema = z.object({
   amount: z.number().min(0),
   currency: z.string(),
   description: z.string(),
-  category_id: z.number().nullable().optional(),
+  categoryId: z.number().nullable().optional(),
   category: CategorySchema.nullable().optional(),
   date: z.string(), // ISO string
   createdAt: z.string(),
@@ -29,10 +29,10 @@ export const ExpenseSchema = z.object({
 export type Expense = z.infer<typeof ExpenseSchema>;
 
 export const ExpenseCategoryAggregateSchema = z.object({
-  category_id: z.number().nullable(),
-  category_description: z.string().nullable(),
-  category_symbol: z.string().nullable(),
-  amount_sum: z.number().min(0),
+  categoryId: z.number().nullable(),
+  categoryDescription: z.string().nullable(),
+  categorySymbol: z.string().nullable(),
+  amountSum: z.number().min(0),
 });
 
 export type ExpenseCategoryAggregate = z.infer<
@@ -40,6 +40,7 @@ export type ExpenseCategoryAggregate = z.infer<
 >;
 
 export const GetExpensesResponseSchema = z.object({
+  total: z.number(),
   expenses: z.array(ExpenseSchema),
   categoryAggregates: z.array(ExpenseCategoryAggregateSchema),
 });

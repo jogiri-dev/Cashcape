@@ -47,7 +47,9 @@ const data: StatCardProps[] = [
 const fetchExpenses = async (): Promise<Expense[]> => {
   const res = await fetch('/api/expenses');
   const data = await res.json();
+  console.log(data);
   const parsed = GetExpensesResponseSchema.parse(data);
+  console.log(parsed);
   return parsed.expenses;
 };
 
