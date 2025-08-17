@@ -14,13 +14,47 @@ type postgresDB struct {
 	db *gorm.DB
 }
 
-func (p *postgresDB) GetExpenses(userId string) (*api.GetExpensesResponse, error) {
+func (p *postgresDB) GetExpensesList(userId string, params api.GetExpensesParams) ([]api.Expense, error) {
 	var expenses []api.Expense
-	if result := p.db.Where(&api.Expense{UserID: userId}).Find(&expenses); result.Error != nil {
-		return nil, result.Error
+	query := p.db.Preload("Category").Where(&api.Expense{UserID: userId})
+
+	if !params.TimeStart.IsZero() {
+		query = query.Where("date >= ?", params.TimeStart)
+	}
+	if !params.TimeEnd.IsZero() {
+		query = query.Where("date <= ?", params.TimeEnd)
 	}
 
-	return &api.GetExpensesResponse{Expenses: expenses}, nil
+	if err := query.Find(&expenses); err.Error != nil {
+		log.Error(err.Error)
+		return nil, err.Error
+	}
+
+	return expenses, nil
+}
+
+func (p *postgresDB) GetExpensesCategoryAggregates(userId string, params api.GetExpensesParams) ([]api.ExpenseCategoryAggregate, error) {
+	var aggregates []api.ExpenseCategoryAggregate
+
+	query := p.db.Table("expenses").
+		Where("expenses.user_id = ?", userId).
+		Joins("LEFT JOIN categories ON expenses.category_id = categories.id").
+		Select("expenses.category_id,  categories.description as category_description, categories.symbol  as category_symbol, SUM(expenses.amount) as amount_sum").
+		Group("expenses.category_id, categories.description, categories.symbol")
+
+	if !params.TimeStart.IsZero() {
+		query = query.Where("date >= ?", params.TimeStart)
+	}
+	if !params.TimeEnd.IsZero() {
+		query = query.Where("date <= ?", params.TimeEnd)
+	}
+
+	if err := query.Scan(&aggregates); err.Error != nil {
+		log.Error(err.Error)
+		return nil, err.Error
+	}
+
+	return aggregates, nil
 }
 
 func (p *postgresDB) AddExpense(params api.AddExpenseParams) (*api.AddExpenseResponse, error) {

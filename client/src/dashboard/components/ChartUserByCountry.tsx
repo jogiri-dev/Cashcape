@@ -17,6 +17,7 @@ import {
   BrazilFlag,
   GlobeFlag,
 } from '../internals/components/CustomIcons';
+import { Expense } from '../../types';
 
 const data = [
   { label: 'India', value: 50000 },
@@ -123,7 +124,25 @@ const colors = [
   'hsl(220, 20%, 25%)',
 ];
 
-export default function ChartUserByCountry() {
+export default function ChartUserByCountry({
+  expenses,
+}: {
+  expenses: Expense[];
+}) {
+  const SLICER = 5;
+  // TODO: Change logic
+  const data = expenses.slice(0, SLICER).map((expense) => ({
+    label: expense.category?.description,
+    value: expense.amount,
+  }));
+
+  const countries = expenses.slice(SLICER).map((expense) => ({
+    name: expense.category?.description,
+    value: 100 / SLICER,
+    flag: expense.category?.symbol,
+    color: 'hsl(220, 25%, 65%)',
+  }));
+
   return (
     <Card
       variant="outlined"

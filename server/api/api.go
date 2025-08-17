@@ -22,7 +22,7 @@ type Expense struct {
 	Amount      int64     `json:"amount" gorm:"not null" validate:"required,gt=0"` // In cents
 	Currency    string    `json:"currency" gorm:"not null" validate:"currency"`    // Custom validation function to check for supported currencies                        // Prepare for later implementation, not required for now
 	Description string    `json:"description" gorm:"not null" validate:"required"`
-	CategoryID  *int64    `json:"category_id" gorm:"constraint:OnDelete:SET NULL,OnUpdate:CASCADE;"` // Prepare for later implementation, empty for uncategorized
+	CategoryID  *int64    `json:"categoryId" gorm:"constraint:OnDelete:SET NULL,OnUpdate:CASCADE;"` // Prepare for later implementation, empty for uncategorized
 	Category    *Category `json:"category,omitempty" gorm:"constraint:OnDelete:SET NULL,OnUpdate:CASCADE;"`
 	Date        time.Time `json:"date" gorm:"not null" validate:"required"` // <-- Expense date. Set to midnight
 	CreatedAt   time.Time `json:"createdAt" gorm:"autoCreateTime"`
@@ -37,12 +37,22 @@ type Category struct {
 	CreatedAt   time.Time `json:"createdAt" gorm:"autoCreateTime"`
 }
 
+type ExpenseCategoryAggregate struct {
+	CategoryID          *int64  `json:"categoryId"`
+	CategoryDescription *string `json:"categoryDescription"`
+	CategorySymbol      *string `json:"categorySymbol"`
+	AmountSum           int64   `json:"amountSum"`
+}
+
 type GetExpensesResponse struct {
-	Expenses []Expense `json:"expenses"` // Slice of all expenses
+	Total              int64                      `json:"total"`
+	Expenses           []Expense                  `json:"expenses"`
+	CategoryAggregates []ExpenseCategoryAggregate `json:"categoryAggregates"`
 }
 
 type GetExpensesParams struct {
-	//TODO Add pagination and filtering option
+	TimeStart time.Time `schema:"timeStart"`
+	TimeEnd   time.Time `schema:"timeEnd"`
 }
 
 type AddExpenseParams struct {

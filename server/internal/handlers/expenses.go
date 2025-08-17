@@ -20,22 +20,35 @@ func (h *Handler) GetExpenses(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO Remove as no body used here for now?
 	if err := decoder.Decode(&params, r.URL.Query()); err != nil {
 		log.Error(err)
-		http.Error(w, "Invalid request body: "+err.Error(), http.StatusBadRequest)
+		http.Error(w, "Invalid query parameters: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	expenseResponse, err := h.db.GetExpenses(userId)
+	expenseResponse, err := h.db.GetExpensesList(userId, params)
 	if err != nil {
-		log.WithError(err).Error("Could not retrieve expenses from DB") // TODO: Check what happens if empty array?
+		log.WithError(err).Error("Could not retrieve expense list from DB") // TODO: Check what happens if empty array?
 		api.InternalErrorHandler(w)
 		return
 	}
 
+	expenseAggregatesResponse, err := h.db.GetExpensesCategoryAggregates(userId, params)
+	if err != nil {
+		log.WithError(err).Error("Could not retrieve aggregated expenses per category from DB") // TODO: Check what happens if empty array?
+		api.InternalErrorHandler(w)
+		return
+	}
+
+	log.Info(expenseAggregatesResponse)
+
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(expenseResponse)
+	response := api.GetExpensesResponse{
+		Expenses:           expenseResponse,
+		CategoryAggregates: expenseAggregatesResponse,
+	}
+
+	err = json.NewEncoder(w).Encode(response)
 
 	if err != nil {
 		log.Error(err)

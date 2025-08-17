@@ -6,7 +6,8 @@ import (
 )
 
 type DatabaseInterface interface {
-	GetExpenses(userId string) (*api.GetExpensesResponse, error)
+	GetExpensesList(userId string, params api.GetExpensesParams) ([]api.Expense, error)
+	GetExpensesCategoryAggregates(userId string, params api.GetExpensesParams) ([]api.ExpenseCategoryAggregate, error)
 	AddExpense(expense api.AddExpenseParams) (*api.AddExpenseResponse, error)
 	SetupDatabase() error
 }

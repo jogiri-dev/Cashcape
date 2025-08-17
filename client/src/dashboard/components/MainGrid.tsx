@@ -6,6 +6,9 @@ import CustomizedDataGrid from './CustomizedDataGrid';
 import PageViewsBarChart from './PageViewsBarChart';
 import { StatCardProps } from './StatCard';
 import ChartUserByCountry from './ChartUserByCountry';
+import { useEffect, useState } from 'react';
+import { Expense, GetExpensesResponseSchema } from '../../types';
+import { useQuery } from '@tanstack/react-query';
 
 const data: StatCardProps[] = [
   {
@@ -41,10 +44,32 @@ const data: StatCardProps[] = [
   },
 ];
 
+const fetchExpenses = async (): Promise<Expense[]> => {
+  const res = await fetch('/api/expenses');
+  const data = await res.json();
+  const parsed = GetExpensesResponseSchema.parse(data);
+  return parsed.expenses;
+};
+
 export default function MainGrid() {
+  const {
+    isPending,
+    error,
+    data: expenses,
+  } = useQuery({ queryKey: ['expenses'], queryFn: fetchExpenses });
+  //TODO add userId query key from context in multiuser case
+
   return (
     <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
       {/* cards */}
+      {isPending && <p>Loading...</p>}
+      {expenses && (
+        <p>
+          The first expense to be displayed as category '
+          {expenses[0].description}'
+        </p>
+      )}
+      {error && <p>{error.message};</p>}
       <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
         Overview
       </Typography>
@@ -66,7 +91,7 @@ export default function MainGrid() {
         </Grid> */}
         <Grid size={{ xs: 12, md: 6 }}>
           {/* <SessionsChart /> */}
-          <ChartUserByCountry />
+          {expenses && <ChartUserByCountry expenses={expenses} />}
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <PageViewsBarChart />
@@ -77,7 +102,7 @@ export default function MainGrid() {
       </Typography>
       <Grid container spacing={2} columns={12}>
         <Grid size={{ xs: 12, lg: 12 }}>
-          <CustomizedDataGrid />
+          {expenses && <CustomizedDataGrid expenses={expenses} />}
         </Grid>
         {/* // TODO: Remove */}
         {/* <Grid size={{ xs: 12, lg: 3 }}>
