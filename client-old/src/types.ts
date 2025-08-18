@@ -18,9 +18,9 @@ export type Category = z.infer<typeof CategorySchema>;
 
 export const ExpenseSchema = z.object({
   id: z.number(),
+  description: z.string(),
   amount: z.number().min(0),
   currency: z.string(),
-  description: z.string(),
   categoryId: z.number().nullable().optional(),
   category: CategorySchema.nullable().optional(),
   date: z.string(), // ISO string

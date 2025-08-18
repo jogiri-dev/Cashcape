@@ -40,8 +40,6 @@ func (h *Handler) GetExpenses(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Info(expenseAggregatesResponse)
-
 	w.Header().Set("Content-Type", "application/json")
 	response := api.GetExpensesResponse{
 		Expenses:           expenseResponse,
