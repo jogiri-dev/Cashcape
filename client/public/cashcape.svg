@@ -1,0 +1,16 @@
+<svg width="200" height="140" viewBox="30 70 140 70" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .bill { fill: #4CAF50; }
+    .wing { fill: #B3E5FC; }
+    .symbol { fill: white; font-size: 28px; font-family: Arial, sans-serif; font-weight: bold; }
+  </style>
+  <!-- Money bill -->
+  <rect x="60" y="80" width="80" height="60" rx="6" class="bill"/>
+  <text x="100" y="118" text-anchor="middle" class="symbol">$</text>
+
+  <!-- Left wing -->
+  <path class="wing" d="M60 80 C40 70, 30 90, 50 110 C30 110, 40 120, 60 110" />
+
+  <!-- Right wing -->
+  <path class="wing" d="M140 80 C160 70, 170 90, 150 110 C170 110, 160 120, 140 110" />
+</svg>

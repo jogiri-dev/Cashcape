@@ -1,7 +1,8 @@
 import * as React from "react";
 import { Crud } from "@toolpad/core/Crud";
 import { useParams } from "react-router";
-import { expensesDataSource, Expense, employeesCache } from "../data/expenses";
+import { expensesDataSource, employeesCache } from "../data/expenses";
+import { Expense } from "../data/types";
 
 export default function ExpensesCrudPage() {
   const { expenseId } = useParams();
@@ -16,7 +17,7 @@ export default function ExpensesCrudPage() {
       pageTitles={{
         show: `Expense ${expenseId}`,
         create: "New Expense",
-        edit: `Expense ${expenseId} - Edit`,
+        edit: `Expense ${expenseId}`,
       }}
     />
   );

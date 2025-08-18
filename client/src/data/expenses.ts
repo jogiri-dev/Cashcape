@@ -1,62 +1,21 @@
 import { DataModel, DataSource, DataSourceCache } from "@toolpad/core/Crud";
 import { z } from "zod";
 import dayjs from "dayjs";
+import { Expense } from "./types";
 
-type EmployeeRole = "Market" | "Finance" | "Development";
-
-type Category = {
-  id: number;
-  userId: string;
-  description: string;
-  symbol: string;
-  createdAt: string;
-};
-
-export interface Expense extends DataModel {
-  id: number;
-  description: string;
-  amount: number;
-  currency: string;
-  categoryId?: number;
-  category?: Category;
-  date: string;
-  role: EmployeeRole;
-}
-
-// const INITIAL_EMPLOYEES_STORE: Expense[] = [
-//   {
-//     id: 1,
-//     description: "Edward Perry",
-//     amount: 25,
-//     date: new Date().toISOString(),
-//     role: "Finance",
-//     currency: "",
-//   },
-//   {
-//     id: 2,
-//     description: "Josephine Drake",
-//     amount: 36,
-//     date: new Date().toISOString(),
-//     role: "Market",
-//     currency: "",
-//   },
-//   {
-//     id: 3,
-//     description: "Cody Phillips",
-//     amount: 19,
-//     date: new Date().toISOString(),
-//     role: "Development",
-//     currency: "",
-//   },
-// ];
+// TODO: Fetch from server instead
+const standardCategories = [
+  { id: 1, description: "Food", symbol: "🍔" },
+  { id: 2, description: "Transport", symbol: "🚗" },
+  { id: 3, description: "Shopping", symbol: "🛍️" },
+  { id: 4, description: "Utilities & Bills", symbol: "💡" },
+  { id: 5, description: "Health & Fitness", symbol: "💊" },
+];
 
 const getExpenses = async (): Promise<Expense[]> => {
   const res = await fetch("/api/expenses");
   const data = await res.json();
   return data.expenses;
-
-  // const value = localStorage.getItem("employees-store");
-  // return value ? JSON.parse(value) : INITIAL_EMPLOYEES_STORE;
 };
 
 const setExpensesStore = (value: Expense[]) => {
@@ -65,7 +24,6 @@ const setExpensesStore = (value: Expense[]) => {
 
 export const expensesDataSource: DataSource<Expense> = {
   fields: [
-    // { field: "id", headerName: "ID" },
     { field: "description", headerName: "Description", width: 140 },
     {
       field: "amount",
@@ -84,9 +42,13 @@ export const expensesDataSource: DataSource<Expense> = {
     },
     {
       field: "categoryId",
-      headerName: "CategoryId",
-      type: "number",
+      headerName: "Category",
       width: 100,
+      type: "singleSelect",
+      valueOptions: standardCategories.map((cat) => ({
+        value: cat.id,
+        label: `${cat.symbol} ${cat.description}`,
+      })),
       sortable: false,
       filterable: false,
       valueFormatter: (_, row: Expense) => {
@@ -95,20 +57,8 @@ export const expensesDataSource: DataSource<Expense> = {
         } `;
       },
     },
-    // {
-    //   field: "role",
-    //   headerName: "Department",
-    //   type: "singleSelect",
-    //   valueOptions: ["Market", "Finance", "Development"],
-    //   width: 160,
-    // },
   ],
   getMany: async ({ paginationModel, filterModel, sortModel }) => {
-    // Simulate loading delay
-    await new Promise((resolve) => {
-      setTimeout(resolve, 750);
-    });
-
     const expensesStore = await getExpenses();
 
     let filteredExpenses = [...expensesStore];
@@ -174,22 +124,9 @@ export const expensesDataSource: DataSource<Expense> = {
       itemCount: filteredExpenses.length,
     };
   },
+  // TODO Implement fetch one expense
   getOne: async (expenseId) => {
-    // Simulate loading delay
-    await new Promise((resolve) => {
-      setTimeout(resolve, 750);
-    });
-
-    const expensesStore = await getExpenses();
-
-    const expenseToShow = expensesStore.find(
-      (employee) => employee.id === Number(expenseId)
-    );
-
-    if (!expenseToShow) {
-      throw new Error("Employee not found");
-    }
-    return expenseToShow;
+    throw new Error("Feature coming soon");
   },
   createOne: async (inputData) => {
     const response = await fetch("/api/expenses", {
@@ -200,8 +137,6 @@ export const expensesDataSource: DataSource<Expense> = {
       body: JSON.stringify({ expense: inputData }),
     });
 
-    console.log(JSON.stringify(inputData));
-
     if (!response.ok) {
       throw new Error("Failed to create expense in database");
     }
@@ -211,38 +146,21 @@ export const expensesDataSource: DataSource<Expense> = {
 
     return newExpense;
   },
+  // TODO Implement Update API endpoint
   updateOne: async (expenseId, data) => {
-    // Simulate loading delay
-    await new Promise((resolve) => {
-      setTimeout(resolve, 750);
-    });
-
-    const expensesStore = await getExpenses();
-
-    let updatedExpense: Expense | null = null;
-
-    setExpensesStore(
-      expensesStore.map((expense) => {
-        if (expense.id === Number(expenseId)) {
-          updatedExpense = { ...expense, ...data };
-          return updatedExpense;
-        }
-        return expense;
-      })
-    );
-
-    if (!updatedExpense) {
-      throw new Error("Expense not found");
-    }
-    return updatedExpense;
+    throw new Error("Feature coming soon");
   },
   deleteOne: async (expenseId) => {
-    console.log("Delete expense id", expenseId);
-    const employeesStore = await getExpenses();
+    const response = await fetch(`/api/expenses/${expenseId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-    setExpensesStore(
-      employeesStore.filter((expense) => expense.id !== Number(expenseId))
-    );
+    if (!response.ok) {
+      throw new Error("Failed to delete expense");
+    }
   },
   validate: z.object({
     description: z

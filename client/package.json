@@ -12,6 +12,7 @@
     "@emotion/styled": "^11",
     "@mui/icons-material": "^7",
     "@mui/material": "^7",
+    "@mui/x-charts": "^8.10.1",
     "@toolpad/core": "^0.16.0",
     "dayjs": "^1.11.13",
     "react": "^19.0.0",

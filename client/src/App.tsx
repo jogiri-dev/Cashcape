@@ -1,5 +1,5 @@
 import * as React from "react";
-import DashboardIcon from "@mui/icons-material/Dashboard";
+import PieChartIcon from "@mui/icons-material/PieChart";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import { Outlet } from "react-router";
 import { ReactRouterAppProvider } from "@toolpad/core/react-router";
@@ -12,7 +12,7 @@ const NAVIGATION: Navigation = [
   },
   {
     title: "Dashboard",
-    icon: <DashboardIcon />,
+    icon: <PieChartIcon />,
   },
   {
     segment: "expenses",
@@ -23,7 +23,8 @@ const NAVIGATION: Navigation = [
 ];
 
 const BRANDING = {
-  title: "My Toolpad Core App",
+  title: "Cashcape",
+  logo: <img src="./cashcape.svg" alt="logo" />,
 };
 
 export default function App() {

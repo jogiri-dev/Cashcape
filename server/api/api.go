@@ -45,7 +45,6 @@ type ExpenseCategoryAggregate struct {
 }
 
 type GetExpensesResponse struct {
-	Total              int64                      `json:"total"`
 	Expenses           []Expense                  `json:"expenses"`
 	CategoryAggregates []ExpenseCategoryAggregate `json:"categoryAggregates"`
 }
