@@ -1,5 +1,6 @@
 import { DataModel, DataSource, DataSourceCache } from "@toolpad/core/Crud";
 import { z } from "zod";
+import dayjs from "dayjs";
 
 type EmployeeRole = "Market" | "Finance" | "Development";
 
@@ -22,32 +23,32 @@ export interface Expense extends DataModel {
   role: EmployeeRole;
 }
 
-const INITIAL_EMPLOYEES_STORE: Expense[] = [
-  {
-    id: 1,
-    description: "Edward Perry",
-    amount: 25,
-    date: new Date().toISOString(),
-    role: "Finance",
-    currency: "",
-  },
-  {
-    id: 2,
-    description: "Josephine Drake",
-    amount: 36,
-    date: new Date().toISOString(),
-    role: "Market",
-    currency: "",
-  },
-  {
-    id: 3,
-    description: "Cody Phillips",
-    amount: 19,
-    date: new Date().toISOString(),
-    role: "Development",
-    currency: "",
-  },
-];
+// const INITIAL_EMPLOYEES_STORE: Expense[] = [
+//   {
+//     id: 1,
+//     description: "Edward Perry",
+//     amount: 25,
+//     date: new Date().toISOString(),
+//     role: "Finance",
+//     currency: "",
+//   },
+//   {
+//     id: 2,
+//     description: "Josephine Drake",
+//     amount: 36,
+//     date: new Date().toISOString(),
+//     role: "Market",
+//     currency: "",
+//   },
+//   {
+//     id: 3,
+//     description: "Cody Phillips",
+//     amount: 19,
+//     date: new Date().toISOString(),
+//     role: "Development",
+//     currency: "",
+//   },
+// ];
 
 const getExpenses = async (): Promise<Expense[]> => {
   const res = await fetch("/api/expenses");
@@ -78,14 +79,13 @@ export const expensesDataSource: DataSource<Expense> = {
       field: "date",
       headerName: "Date",
       type: "date",
-      valueFormatter: (_, row: Expense) => {
-        return new Date(row.date).toLocaleDateString("sv-SE");
-      },
+      valueFormatter: (_, row: Expense) => dayjs(row.date).format("YYYY-MM-DD"),
       width: 140,
     },
     {
-      field: "category",
-      headerName: "Category",
+      field: "categoryId",
+      headerName: "CategoryId",
+      type: "number",
       width: 100,
       sortable: false,
       filterable: false,
@@ -95,6 +95,13 @@ export const expensesDataSource: DataSource<Expense> = {
         } `;
       },
     },
+    // {
+    //   field: "role",
+    //   headerName: "Department",
+    //   type: "singleSelect",
+    //   valueOptions: ["Market", "Finance", "Development"],
+    //   width: 160,
+    // },
   ],
   getMany: async ({ paginationModel, filterModel, sortModel }) => {
     // Simulate loading delay
@@ -184,22 +191,23 @@ export const expensesDataSource: DataSource<Expense> = {
     }
     return expenseToShow;
   },
-  createOne: async (data) => {
-    // Simulate loading delay
-    await new Promise((resolve) => {
-      setTimeout(resolve, 750);
+  createOne: async (inputData) => {
+    const response = await fetch("/api/expenses", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ expense: inputData }),
     });
 
-    const expensesStore = await getExpenses();
+    console.log(JSON.stringify(inputData));
 
-    const newExpense = {
-      id:
-        expensesStore.reduce((max, expense) => Math.max(max, expense.id), 0) +
-        1,
-      ...data,
-    } as Expense;
+    if (!response.ok) {
+      throw new Error("Failed to create expense in database");
+    }
 
-    setExpensesStore([...expensesStore, newExpense]);
+    const newExpense = await response.json();
+    console.log(newExpense);
 
     return newExpense;
   },
@@ -229,11 +237,7 @@ export const expensesDataSource: DataSource<Expense> = {
     return updatedExpense;
   },
   deleteOne: async (expenseId) => {
-    // Simulate loading delay
-    await new Promise((resolve) => {
-      setTimeout(resolve, 750);
-    });
-
+    console.log("Delete expense id", expenseId);
     const employeesStore = await getExpenses();
 
     setExpensesStore(
@@ -251,11 +255,7 @@ export const expensesDataSource: DataSource<Expense> = {
       .string({ required_error: "Date is required" })
       .nonempty("Date is required"),
     //TODO: Fix category input
-    category: z.enum(["Market", "Finance", "Development"], {
-      errorMap: () => ({
-        message: 'Role must be "Market", "Finance" or "Development"',
-      }),
-    }),
+    categoryId: z.number().optional(),
   })["~standard"].validate,
 };
 

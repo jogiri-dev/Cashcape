@@ -12,7 +12,7 @@ export default function ExpensesCrudPage() {
       // dataSourceCache={employeesCache}
       rootPath="/expenses"
       initialPageSize={25}
-      defaultValues={{ itemCount: 5 }}
+      defaultValues={{ currency: "SEK" }}
       pageTitles={{
         show: `Expense ${expenseId}`,
         create: "New Expense",
