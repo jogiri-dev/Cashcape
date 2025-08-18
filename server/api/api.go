@@ -24,7 +24,7 @@ type Expense struct {
 	Description string    `json:"description" gorm:"not null" validate:"required"`
 	CategoryID  *int64    `json:"categoryId" gorm:"constraint:OnDelete:SET NULL,OnUpdate:CASCADE;"` // Prepare for later implementation, empty for uncategorized
 	Category    *Category `json:"category,omitempty" gorm:"constraint:OnDelete:SET NULL,OnUpdate:CASCADE;"`
-	Date        time.Time `json:"date" gorm:"not null" validate:"required"` // <-- Expense date. Set to midnight
+	Date        time.Time `json:"date" gorm:"not null" validate:"required"` // Expense date. Set to midnight.
 	CreatedAt   time.Time `json:"createdAt" gorm:"autoCreateTime"`
 }
 

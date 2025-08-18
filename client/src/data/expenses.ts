@@ -172,7 +172,6 @@ export const expensesDataSource: DataSource<Expense> = {
     date: z
       .string({ required_error: "Date is required" })
       .nonempty("Date is required"),
-    //TODO: Fix category input
     categoryId: z.number().optional(),
   })["~standard"].validate,
 };

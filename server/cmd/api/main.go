@@ -18,7 +18,7 @@ func main() {
 
 	log.SetReportCaller(true)
 
-	db, err := tools.NewDatabase() // TODO: Rename/reorganize tools?
+	db, err := tools.NewDatabase()
 	if err != nil {
 		log.Fatal(err)
 	}

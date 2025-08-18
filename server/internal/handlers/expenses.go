@@ -31,14 +31,14 @@ func (h *Handler) GetExpenses(w http.ResponseWriter, r *http.Request) {
 
 	expenseResponse, err := h.db.GetExpensesList(userId, params)
 	if err != nil {
-		log.WithError(err).Error("Could not retrieve expense list from DB") // TODO: Check what happens if empty array?
+		log.WithError(err).Error("Could not retrieve expense list from DB")
 		api.InternalErrorHandler(w)
 		return
 	}
 
 	expenseAggregatesResponse, err := h.db.GetExpensesCategoryAggregates(userId, params)
 	if err != nil {
-		log.WithError(err).Error("Could not retrieve aggregated expenses per category from DB") // TODO: Check what happens if empty array?
+		log.WithError(err).Error("Could not retrieve aggregated expenses per category from DB")
 		api.InternalErrorHandler(w)
 		return
 	}
