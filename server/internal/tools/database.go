@@ -9,6 +9,7 @@ type DatabaseInterface interface {
 	GetExpensesList(userId string, params api.GetExpensesParams) ([]api.Expense, error)
 	GetExpensesCategoryAggregates(userId string, params api.GetExpensesParams) ([]api.ExpenseCategoryAggregate, error)
 	AddExpense(expense api.AddExpenseParams) (*api.AddExpenseResponse, error)
+	DeleteExpense(userId string, expenseId string) error
 	SetupDatabase() error
 }
 

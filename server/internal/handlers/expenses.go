@@ -2,11 +2,14 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
+	"github.com/go-chi/chi"
 	"github.com/gorilla/schema"
 	"github.com/jogiri-dev/cashcape/server/api"
 	log "github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 func (h *Handler) GetExpenses(w http.ResponseWriter, r *http.Request) {
@@ -71,7 +74,6 @@ func (h *Handler) AddExpense(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Add userId from context
 	userId, ok := getUserIDfromContext(r)
 	if !ok {
 		log.Error("Could not retrieve userId")
@@ -94,6 +96,35 @@ func (h *Handler) AddExpense(w http.ResponseWriter, r *http.Request) {
 		api.InternalErrorHandler(w)
 		return
 	}
+}
+
+func (h *Handler) DeleteExpense(w http.ResponseWriter, r *http.Request) {
+	expenseId := chi.URLParam(r, "id")
+
+	if expenseId == "" {
+		log.Error("Missing expense ID")
+		http.Error(w, "Missing expense ID", http.StatusBadRequest)
+		return
+	}
+
+	userId, ok := getUserIDfromContext(r)
+	if !ok {
+		log.Error("Could not retrieve userId")
+		api.InternalErrorHandler(w)
+		return
+	}
+
+	if err := h.db.DeleteExpense(userId, expenseId); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			http.Error(w, "Expense not found", http.StatusNotFound)
+			return
+		}
+		log.Error(err)
+		api.InternalErrorHandler(w)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func getUserIDfromContext(r *http.Request) (string, bool) {

@@ -66,6 +66,18 @@ func (p *postgresDB) AddExpense(params api.AddExpenseParams) (*api.AddExpenseRes
 	return &api.AddExpenseResponse{Expense: params.Expense}, nil
 }
 
+func (p *postgresDB) DeleteExpense(userId string, expenseId string) error {
+	result := p.db.Where("id = ? AND user_id = ?", expenseId, userId).Delete(&api.Expense{})
+	if result.Error != nil {
+		log.Error(result.Error)
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}
+
 func (p *postgresDB) SetupDatabase() error {
 	var dsn, okDSN = os.LookupEnv("DB_DSN")
 	if !okDSN {

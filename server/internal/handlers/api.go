@@ -37,6 +37,7 @@ func (h *Handler) RegisterRoutes(r *chi.Mux) {
 	r.Route("/api/expenses", func(router chi.Router) {
 		router.Get("/", h.GetExpenses)
 		router.Post("/", h.AddExpense)
+		router.Delete("/{id}", h.DeleteExpense)
 	})
 
 }
