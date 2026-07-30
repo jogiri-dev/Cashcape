@@ -14,7 +14,7 @@ services:
       - "5433:5432"
 
   backend:
-    image: ghcr.io/<your-username>/expense-backend:staging
+    image: ghcr.io/jogiri-dev/cashcape-backend:staging
     container_name: cashcape-backend-staging
     restart: always
     depends_on:
@@ -27,7 +27,7 @@ services:
       - "8081:8080"
 
   frontend:
-    image: ghcr.io/<your-username>/expense-frontend:staging
+    image: ghcr.io/jogiri-dev/cashcape-frontend:staging
     container_name: cashcape-frontend-staging
     restart: always
     ports:

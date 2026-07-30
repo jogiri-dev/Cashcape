@@ -60,7 +60,7 @@ Cashcape is an expense tracker app built to help users manage and visualize thei
 
 The app runs on a self-hosted Raspberry Pi via Docker Compose, with images built and published automatically by GitHub Actions.
 
-- **Registry:** Images are pushed to [GHCR](https://ghcr.io) as `expense-backend` and `expense-frontend`.
+- **Registry:** Images are pushed to [GHCR](https://ghcr.io) as `cashcape-backend` and `cashcape-frontend`.
 - **Staging:** Every push to `main` builds and tags images as `:staging`, which auto-deploys.
 - **Production:** Promotion to `:prod` is a manual, approval-gated step in GitHub Actions — no rebuild, just retagging the exact image that was tested in staging.
 

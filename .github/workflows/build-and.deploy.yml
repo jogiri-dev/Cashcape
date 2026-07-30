@@ -36,8 +36,8 @@ jobs:
           platforms: linux/arm64
           push: true
           tags: |
-            ghcr.io/${{ env.IMAGE_OWNER }}/expense-backend:${{ steps.vars.outputs.sha }}
-            ghcr.io/${{ env.IMAGE_OWNER }}/expense-backend:staging
+            ghcr.io/${{ env.IMAGE_OWNER }}/cashcape-backend:${{ steps.vars.outputs.sha }}
+            ghcr.io/${{ env.IMAGE_OWNER }}/cashcape-backend:staging
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -48,8 +48,8 @@ jobs:
           platforms: linux/arm64
           push: true
           tags: |
-            ghcr.io/${{ env.IMAGE_OWNER }}/expense-frontend:${{ steps.vars.outputs.sha }}
-            ghcr.io/${{ env.IMAGE_OWNER }}/expense-frontend:staging
+            ghcr.io/${{ env.IMAGE_OWNER }}/cashcape-frontend:${{ steps.vars.outputs.sha }}
+            ghcr.io/${{ env.IMAGE_OWNER }}/cashcape-frontend:staging
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -69,11 +69,11 @@ jobs:
       - name: Retag backend as prod
         run: |
           docker buildx imagetools create \
-            -t ghcr.io/${{ github.repository_owner }}/expense-backend:prod \
-            ghcr.io/${{ github.repository_owner }}/expense-backend:${{ needs.build.outputs.sha }}
+            -t ghcr.io/${{ github.repository_owner }}/cashcape-backend:prod \
+            ghcr.io/${{ github.repository_owner }}/cashcape-backend:${{ needs.build.outputs.sha }}
 
       - name: Retag frontend as prod
         run: |
           docker buildx imagetools create \
-            -t ghcr.io/${{ github.repository_owner }}/expense-frontend:prod \
-            ghcr.io/${{ github.repository_owner }}/expense-frontend:${{ needs.build.outputs.sha }}
+            -t ghcr.io/${{ github.repository_owner }}/cashcape-frontend:prod \
+            ghcr.io/${{ github.repository_owner }}/cashcape-frontend:${{ needs.build.outputs.sha }}
