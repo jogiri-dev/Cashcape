@@ -13,21 +13,31 @@ Cashcape is an expense tracker app built to help users manage and visualize thei
 - **Database:** PostgreSQL
 - **Frontend:** React app created with Vite based on Material UI (MUI) Dashboard template
 
+## Project Structure
+
+- `server/` — Go backend
+- `client/` — React frontend (Vite + MUI)
+- `docker-compose.dev.yml` — local Postgres only, for local development
+- `docker-compose.staging.yml` / `docker-compose.prod.yml` — full stack (db + backend + frontend) for Pi deployment
+- `.github/workflows/` — CI/CD pipeline (build, push, staging auto-deploy, manual prod promotion)
+
 ## Getting Started
 
 1. **Create local Postgres DB with Docker Compose**
 
    ```sh
-   docker compose up -d
+   docker compose -f docker-compose.dev.yml up -d
    ```
 
 2. **Create a `.env` file for environment variables**
 
-   Create a `.env` file in the project root with the following content (replace with your own credentials as needed):
+   Copy the example file and fill in your own values:
 
+   ```sh
+   cp .env.example .env
    ```
-   DB_DSN="postgres://admin:examplepassword@localhost:5432/cashcape?sslmode=disable"
-   ```
+
+   `.env.example` documents the required variables:
 
 3. **Run the Go server to create tables with automigrate**
 
@@ -46,6 +56,30 @@ Cashcape is an expense tracker app built to help users manage and visualize thei
    npm run dev
    ```
 
+## Deployment
+
+The app runs on a self-hosted Raspberry Pi via Docker Compose, with images built and published automatically by GitHub Actions.
+
+- **Registry:** Images are pushed to [GHCR](https://ghcr.io) as `expense-backend` and `expense-frontend`.
+- **Staging:** Every push to `main` builds and tags images as `:staging`, which auto-deploys.
+- **Production:** Promotion to `:prod` is a manual, approval-gated step in GitHub Actions — no rebuild, just retagging the exact image that was tested in staging.
+
+To deploy manually on the Pi:
+
+```sh
+# staging
+docker compose --env-file .env.staging -f docker-compose.staging.yml pull
+docker compose --env-file .env.staging -f docker-compose.staging.yml up -d
+
+# production
+docker compose --env-file .env.prod -f docker-compose.prod.yml pull
+docker compose --env-file .env.prod -f docker-compose.prod.yml up -d
+```
+
+`.env.prod` and `.env.staging` are created directly on the Pi (not committed to the repo) — same variables as `.env.example`, but with `db` as the Postgres host instead of `localhost`, and a distinct `POSTGRES_DB` per environment (e.g. `cashcape_staging`) to keep data isolated.
+
+See `.github/workflows/build-and-deploy.yml` for the full pipeline.
+
 ## MVP Goals
 
 - [x] **Get familiar with Go (my first GO project)**
@@ -61,8 +95,9 @@ Cashcape is an expense tracker app built to help users manage and visualize thei
 
 - [ ] Filtering by date and automatic grouping by month
 - [ ] Multi-user authentication and authorization
-- [ ] Integration tests and CI/CD pipeline
-- [ ] Dockerize backend and frontend for easy deployment
+- [ ] Integration tests
+- [x] CI/CD pipeline (build, push, staging auto-deploy, manual prod promotion)
+- [x] Dockerize backend and frontend for easy deployment
 - [ ] Advanced dashboard analytics (category breakdowns, trends)
 - [ ] Editable expenses and category management
 - [ ] Mobile-friendly UI
