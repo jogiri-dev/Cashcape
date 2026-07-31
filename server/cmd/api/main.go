@@ -27,7 +27,7 @@ func main() {
 	h := handlers.NewHandler(db)
 	h.RegisterRoutes(r)
 
-	var port = "localhost:8000"
+	var port = ":8000"
 
 	fmt.Printf("Starting GO API service on http://%v", port)
 
